@@ -1,7 +1,4 @@
-import torch
-from torchvision import transforms
 from abc import ABC, abstractmethod
-import albumentations as A
 from typing import Any
 
 
@@ -32,15 +29,18 @@ class BaseTransform(ABC):
         pass
 
     @abstractmethod
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         """Диапазон допустимых аргументов в формате словаря.
         Пример возвращающего словаря:
         {
-            'scale_range': [0, float('inf')],
-            'mode': ['blackbody', 'cied']
+            'scale_range': [0, float('inf')], <- int range
+            'slant_range': [-180., 180.], <- float range
+            'mode': ['blackbody', 'cied'], <- str list
         }
 
         Если число, то диапазон [from, to].
         Если str, то список допустимых категорий.
         """
         pass
+

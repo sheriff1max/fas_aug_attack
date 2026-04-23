@@ -2,21 +2,36 @@ from typing import Any, Union, Tuple, Dict, Optional
 import albumentations as A
 import cv2
 from base import BaseTransform
+from enums import DataType
 
 
 GLOBAL_SEED = 42
+
+
+class ArgRange:
+    """"""
+    def __init__(
+        self,
+        values: list[int | float | str],
+        data_type: DataType,
+        is_tuple: bool,
+    ):
+        self.values = values
+        self.data_type = data_type
+        self.is_tuple = is_tuple
+
 
 
 class ShearTransform(BaseTransform):
     def __init__(
         self,
         shear: Union[Tuple[float, float], float, Dict[str, Any]] = (0.0, 0.0), 
-        border_value: int = 0,
+        fill: int = 0,
         seed: int = GLOBAL_SEED
     ):
         super().__init__()
         self.shear = shear
-        self.border_value = border_value
+        self.fill = fill
         self.seed = seed
 
     def transform(self, img: Any) -> Any:
@@ -27,15 +42,16 @@ class ShearTransform(BaseTransform):
                 rotate=0,
                 shear=self.shear,
                 p=1,
-                fill=self.border_value
+                fill=self.fill
             )
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'shear': [-360, 360],
-            'border_value': [0, 255]
+            'shear': [-360., 360.],
+            'fill': [0, 255]
         }
 
 
@@ -43,12 +59,12 @@ class PerspectiveTransform(BaseTransform):
     def __init__(
         self,
         scale: Union[Tuple[float, float], float] = (0.05, 0.1), 
-        pad_value: int = 0,
+        fill: int = 0,
         seed: int = GLOBAL_SEED
     ):
         super().__init__()
         self.scale = scale
-        self.pad_value = pad_value
+        self.fill = fill
         self.seed = seed
 
     def transform(self, img: Any) -> Any:
@@ -56,15 +72,16 @@ class PerspectiveTransform(BaseTransform):
             A.Perspective(
                 scale=self.scale,
                 p=1,
-                fill=self.pad_value
+                fill=self.fill
             )
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'scale': [0, float('inf')],
-            'pad_value': [0, 255]
+            'scale': [0., float('inf')],
+            'fill': [0, 255]
         }
 
 
@@ -73,13 +90,13 @@ class ElasticTransform(BaseTransform):
         self,
         alpha: float = 1,
         sigma: float = 50, 
-        border_value: int = 0,
+        fill: int = 0,
         seed: int = GLOBAL_SEED
     ):
         super().__init__()
         self.alpha = alpha
         self.sigma = sigma
-        self.border_value = border_value
+        self.fill = fill
         self.seed = seed
 
     def transform(self, img: Any) -> Any:
@@ -89,16 +106,17 @@ class ElasticTransform(BaseTransform):
                 sigma=self.sigma,
                 p=1,
                 border_mode=cv2.BORDER_CONSTANT,
-                fill=self.border_value
+                fill=self.fill
             )
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'alpha': [0, float('inf')],
-            'sigma': [0, float('inf')],
-            'border_value': [0, 255]
+            'alpha': [0., float('inf')],
+            'sigma': [0., float('inf')],
+            'fill': [0, 255]
         }
 
 
@@ -107,13 +125,13 @@ class GridDistortionTransform(BaseTransform):
         self,
         num_steps: int = 5, 
         distort_limit: Union[Tuple[float, float], float] = (-0.3, 0.3), 
-        border_value: int = 0,
+        fill: int = 0,
         seed: int = GLOBAL_SEED
     ):
         super().__init__()
         self.num_steps = num_steps
         self.distort_limit = distort_limit
-        self.border_value = border_value
+        self.fill = fill
         self.seed = seed
 
     def transform(self, img: Any) -> Any:
@@ -123,16 +141,17 @@ class GridDistortionTransform(BaseTransform):
                 distort_limit=self.distort_limit,
                 p=1,
                 border_mode=cv2.BORDER_CONSTANT,
-                fill=self.border_value
+                fill=self.fill
             )
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'num_steps': [1, float('inf')],
-            'distort_limit': [-1, 1],
-            'border_value': [0, 255]
+            'distort_limit': [-1., 1.],
+            'fill': [0, 255]
         }
 
 
@@ -140,12 +159,12 @@ class OpticalDistortionTransform(BaseTransform):
     def __init__(
         self,
         distort_limit: Union[Tuple[float, float], float] = (-0.05, 0.05), 
-        border_value: int = 0,
+        fill: int = 0,
         seed: int = GLOBAL_SEED
     ):
         super().__init__()
         self.distort_limit = distort_limit
-        self.border_value = border_value
+        self.fill = fill
         self.seed = seed
 
     def transform(self, img: Any) -> Any:
@@ -154,15 +173,16 @@ class OpticalDistortionTransform(BaseTransform):
                 distort_limit=self.distort_limit,
                 p=1,
                 border_mode=cv2.BORDER_CONSTANT,
-                fill=self.border_value
+                fill=self.fill
             )
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'distort_limit': [float('-inf'), float('inf')],
-            'border_value': [0, 255]
+            'fill': [0, 255]
         }
 
 
@@ -172,14 +192,14 @@ class ShiftScaleRotateTransform(BaseTransform):
         shift_limit: Union[Tuple[float, float], float] = (-0.0625, 0.0625),
         scale_limit: Union[Tuple[float, float], float] = (-0.1, 0.1),
         rotate_limit: Union[Tuple[float, float], float] = (-45, 45),
-        border_value: int = 0,
+        fill: int = 0,
         seed: int = GLOBAL_SEED
     ):
         super().__init__()
         self.shift_limit = shift_limit
         self.scale_limit = scale_limit
         self.rotate_limit = rotate_limit
-        self.border_value = border_value
+        self.fill = fill
         self.seed = seed
 
     def transform(self, img: Any) -> Any:
@@ -190,17 +210,18 @@ class ShiftScaleRotateTransform(BaseTransform):
                 rotate_limit=self.rotate_limit,
                 p=1,
                 border_mode=cv2.BORDER_CONSTANT,
-                fill=self.border_value
+                fill=self.fill
             )
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'shift_limit': [-1, 1],
+            'shift_limit': [-1., 1.],
             'scale_limit': [float('-inf'), float('inf')],
-            'rotate_limit': [float('-inf'), float('inf')],
-            'border_value': [0, 255]
+            'rotate_limit': [-360., 360.],
+            'fill': [0, 255]
         }
 
 
@@ -226,10 +247,11 @@ class BrightnessContrastTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'brightness_limit': [-1, 1],
-            'contrast_limit': [-1, 1]
+            'brightness_limit': [-1., 1.],
+            'contrast_limit': [-1., 1.]
         }
 
 
@@ -258,11 +280,12 @@ class HSVTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'hue_shift_limit': [-180, 180],
-            'sat_shift_limit': [-255, 255],
-            'val_shift_limit': [-255, 255]
+            'hue_shift_limit': [-180., 180.],
+            'sat_shift_limit': [-255., 255.],
+            'val_shift_limit': [-255., 255.]
         }
 
 
@@ -291,11 +314,12 @@ class RGBShiftTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'r_shift_limit': [-255, 255],
-            'g_shift_limit': [-255, 255],
-            'b_shift_limit': [-255, 255]
+            'r_shift_limit': [-255., 255.],
+            'g_shift_limit': [-255., 255.],
+            'b_shift_limit': [-255., 255.]
         }
 
 
@@ -318,7 +342,8 @@ class GammaTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'gamma_limit': [0.1, float('inf')]
         }
@@ -346,9 +371,10 @@ class CLAHETransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'clip_limit': [1, float('inf')],
+            'clip_limit': [1., float('inf')],
             'tile_grid_size': [1, 100]
         }
     
@@ -372,9 +398,10 @@ class SolarizeTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'threshold_range': [0, 1]
+            'threshold_range': [0., 1.]
         }
 
 
@@ -397,7 +424,8 @@ class PosterizeTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'num_bits': [1, 7]
         }
@@ -425,7 +453,8 @@ class EqualizeTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'by_channels': [False, True],
             'mode': ['cv', 'pil']
@@ -446,7 +475,8 @@ class InvertTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {}
 
 
@@ -464,7 +494,8 @@ class ToGrayTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {}
 
 
@@ -482,7 +513,8 @@ class ChannelShuffleTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {}
     
 
@@ -500,7 +532,8 @@ class ToSepiaTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {}
 
 
@@ -523,7 +556,8 @@ class BlurTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'blur_limit': [3, float('inf')]
         }
@@ -548,7 +582,8 @@ class GaussianBlurTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'blur_limit': [0, float('inf')]
         }
@@ -573,7 +608,8 @@ class MedianBlurTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'blur_limit': [3, float('inf')]
         }
@@ -598,7 +634,8 @@ class MotionBlurTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'blur_limit': [3, float('inf')]
         }
@@ -635,13 +672,14 @@ class SharpenTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'alpha': [0, 1],
-            'lightness': [0, float('inf')],
+            'alpha': [0., 1.],
+            'lightness': [0., float('inf')],
             'method': ['kernel', 'gaussian'],
             'kernel_size': [1, float('inf')],
-            'sigma': [0, float('inf')]
+            'sigma': [0., float('inf')]
         }
 
 
@@ -670,10 +708,11 @@ class UnsharpMaskTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'alpha': [0, 1],
-            'sigma_limit': [0, float('inf')],
+            'alpha': [0., 1.],
+            'sigma_limit': [0., float('inf')],
             'blur_limit': [0, float('inf')]
         }
 
@@ -700,10 +739,11 @@ class EmbossTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'alpha': [0, 1],
-            'strength': [0, 1]
+            'alpha': [0., 1.],
+            'strength': [0., 1.]
         }
 
 
@@ -735,12 +775,13 @@ class GaussNoiseTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'std_range': [0, 1],
-            'mean_range': [-1, 1],
+            'std_range': [0., 1.],
+            'mean_range': [-1., 1.],
             'per_channel': [False, True],
-            'noise_scale_factor': [0, 1]
+            'noise_scale_factor': [0., 1.]
         }
 
 
@@ -766,9 +807,10 @@ class MultiplicativeNoiseTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'multiplier': [0, float('inf')],
+            'multiplier': [0., float('inf')],
             'per_channel': [False, True]
         }
 
@@ -795,10 +837,11 @@ class ISONoiseTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'intensity': [0, float('inf')],
-            'color_shift': [0, 1]
+            'intensity': [0., float('inf')],
+            'color_shift': [0., 1.]
         }
 
 
@@ -808,14 +851,14 @@ class CoarseDropoutTransform(BaseTransform):
         num_holes_range: Tuple[int, int] = (1, 2),
         hole_height_range: Union[Tuple[float, float], Tuple[int, int]] = (0.1, 0.2),
         hole_width_range: Union[Tuple[float, float], Tuple[int, int]] = (0.1, 0.2),
-        fill_value: int = 0,
+        fill: int = 0,
         seed: int = GLOBAL_SEED
     ):
         super().__init__()
         self.num_holes_range = num_holes_range
         self.hole_height_range = hole_height_range
         self.hole_width_range = hole_width_range
-        self.fill_value = fill_value
+        self.fill = fill
         self.seed = seed
 
     def transform(self, img: Any) -> Any:
@@ -824,18 +867,19 @@ class CoarseDropoutTransform(BaseTransform):
                 num_holes_range=self.num_holes_range,
                 hole_height_range=self.hole_height_range,
                 hole_width_range=self.hole_width_range,
-                fill=self.fill_value,
+                fill=self.fill,
                 p=1
             )
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'num_holes_range': [0, float('inf')],
-            'hole_height_range': [0, 1],
-            'hole_width_range': [0, 1],
-            'fill_value': [0, 255]
+            'hole_height_range': [0., 1.],
+            'hole_width_range': [0., 1.],
+            'fill': [0, 255]
         }
 
 
@@ -844,13 +888,13 @@ class GridDropoutTransform(BaseTransform):
         self, 
         ratio: float = 0.1,
         unit_size_range: Tuple[int, int] = (5, 15),
-        fill_value: int = 0,
+        fill: int = 0,
         seed: int = GLOBAL_SEED
     ):
         super().__init__()
         self.ratio = ratio
         self.unit_size_range = unit_size_range
-        self.fill_value = fill_value
+        self.fill = fill
         self.seed = seed
 
     def transform(self, img: Any) -> Any:
@@ -858,17 +902,18 @@ class GridDropoutTransform(BaseTransform):
             A.GridDropout(
                 ratio=self.ratio,
                 unit_size_range=self.unit_size_range,
-                fill=self.fill_value,
+                fill=self.fill,
                 p=1
             )
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'ratio': [0, 1],
+            'ratio': [0., 1.],
             'unit_size_range': [2, float('inf')],
-            'fill_value': [0, 255]
+            'fill': [0, 255]
         }
 
 
@@ -894,7 +939,8 @@ class CompressionTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'compression_type': ['jpeg', 'webp'],
             'quality_range': [1, 100]
@@ -920,9 +966,10 @@ class DownscaleTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'scale_range': [0, 1]
+            'scale_range': [0., 1.]
         }
 
 
@@ -951,9 +998,10 @@ class PixelDropoutTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'dropout_prob': [0, 1],
+            'dropout_prob': [0., 1.],
             'per_channel': [False, True],
             'drop_value': [0, 1]  # [0, 1] inf float or [0, 255] if int
         }
@@ -993,14 +1041,15 @@ class RainTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'rain_type': ['drizzle', 'heavy', 'torrential'],
-            'slant_range': [-180, 180],
+            'slant_range': [-180., 180.],
             'drop_length': [1, float('inf')],
             'drop_width': [1, float('inf')],
             'blur_value': [1, float('inf')],
-            'brightness_coefficient': [0, 1]
+            'brightness_coefficient': [0., 1.]
         }
 
 
@@ -1029,10 +1078,11 @@ class SnowTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'snow_point_range': [0, 1],
-            'brightness_coeff': [0, float('inf')],
+            'snow_point_range': [0., 1.],
+            'brightness_coeff': [0., float('inf')],
             'method': ['bleach', 'texture']
         }
 
@@ -1059,10 +1109,11 @@ class FogTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'fog_coef_range': [0, 1],
-            'alpha_coef': [0, 1]
+            'fog_coef_range': [0., 1.],
+            'alpha_coef': [0., 1.]
         }
 
 
@@ -1088,7 +1139,8 @@ class ShadowTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'num_shadows_limit': [1, float('inf')],
             'shadow_dimension': [0, float('inf')]
@@ -1123,12 +1175,13 @@ class SunFlareTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'num_flare_circles_range': [1, float('inf')],
             'src_radius': [1, float('inf')],
-            'angle_range': [0, 1],
-            'src_color': [0, 255]
+            'src_color': [0, 255],
+            'angle_range': [0., 1.],
         }
 
 
@@ -1154,9 +1207,10 @@ class RainbowTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'scale': [0, 1],
+            'scale': [0., 1.],
             'per_channel': [False, True]
         }
 
@@ -1195,13 +1249,14 @@ class SpatterTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'mean': [0, float('inf')],
-            'std': [0, float('inf')],
-            'gauss_sigma': [0, float('inf')],
-            'cutout_threshold': [0, float('inf')],
-            'intensity': [0, float('inf')],
+            'mean': [0., float('inf')],
+            'std': [0., float('inf')],
+            'gauss_sigma': [0., float('inf')],
+            'cutout_threshold': [0., float('inf')],
+            'intensity': [0., float('inf')],
             'mode': ['rain', 'mud']
         }
 
@@ -1234,7 +1289,8 @@ class ChromaticAberrationTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'primary_distortion_limit': [float('-inf'), float('inf')],
             'secondary_distortion_limit': [float('-inf'), float('inf')],
@@ -1265,10 +1321,11 @@ class DefocusTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'radius': [1, float('inf')],
-            'alias_blur': [0, float('inf')]
+            'alias_blur': [0., float('inf')]
         }
 
 
@@ -1294,10 +1351,11 @@ class ZoomBlurTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'max_factor': [1, float('inf')],
-            'step_factor': [0, float('inf')]
+            'max_factor': [1., float('inf')],
+            'step_factor': [0., float('inf')]
         }
 
 
@@ -1323,7 +1381,8 @@ class MorphologicalTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'scale': [1, float('inf')],
             'operation': ['dilation', 'erosion']
@@ -1355,7 +1414,8 @@ class PlanckianJitterTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
             'mode': ['blackbody', 'cied'],
             'temperature_limit': [3000, 15000],
@@ -1382,7 +1442,8 @@ class ShotNoiseTransform(BaseTransform):
         ], seed=self.seed)
         return transform_pipeline(image=img)['image']
 
-    def get_ranges(self) -> dict[str, list]:
+    @staticmethod
+    def get_ranges() -> dict[str, list]:
         return {
-            'scale_range': [0, float('inf')]
+            'scale_range': [0., float('inf')]
         }
