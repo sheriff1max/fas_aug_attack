@@ -21,7 +21,7 @@ def get_transform(
     )
 
 
-class MyDataset(Dataset):
+class TorchDataset(Dataset):
     """
     Dataset class for structure:
 

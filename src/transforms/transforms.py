@@ -1,24 +1,12 @@
-from typing import Any, Union, Tuple, Dict, Optional, Literal
+from typing import Any, Literal
 import albumentations as A
 import cv2
 from base import BaseTransform
-from enums import DataType
+from utils.enums import DataType
+from utils.utils import ArgRange
 
 
 GLOBAL_SEED = 42
-
-
-class ArgRange:
-    """"""
-    def __init__(
-        self,
-        values: list[int | float | str],
-        data_type: DataType,
-        is_tuple: bool = False,
-    ):
-        self.values = values
-        self.data_type = data_type
-        self.is_tuple = is_tuple
 
 
 class ShearTransform(BaseTransform):
@@ -77,7 +65,7 @@ class PerspectiveTransform(BaseTransform):
         return transform_pipeline(image=img)['image']
 
     @staticmethod
-    def get_ranges() -> dict[str, list]:
+    def get_ranges() -> dict[str, ArgRange]:
         return {
             'scale': ArgRange(values=[0., float('inf')], data_type=DataType.FLOAT, is_tuple=True),
             'fill': ArgRange(values=[0, 255], data_type=DataType.INT)

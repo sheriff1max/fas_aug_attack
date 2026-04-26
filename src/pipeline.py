@@ -1,6 +1,7 @@
 from base import BaseModel, BaseTransform
 from typing import Any, Type, Literal
 import optuna
+from utils.utils import get_ranges2optuna
 
 
 class AttackPipeline:
@@ -18,7 +19,7 @@ class AttackPipeline:
     def attack(self, img: Any) -> float:
         """Предсказание вероятности положительного класса при
         применённых преобразованиях данных.
-        
+
         :param img: Any - изображение формата, с которым работает
         BaseTransform и BaseModel.
         :return: float - вероятность положительного класса.
@@ -28,38 +29,9 @@ class AttackPipeline:
         return self.model.predict(img)
 
 
-# class OptunaAttackPipeline:
-#     """Pipeline-класс для поиска наилучших преобразований
-#     входных данных, которые наилучшим образом обманывают
-#     модель."""
-
-#     def __init__(
-#         self,
-#         model: BaseModel,
-#         list_type_transforms: list[Type[BaseTransform]],
-#     ):
-#         self.model = model
-#         self.list_type_transforms = list_type_transforms
-
-#     def _objective(self) -> float:
-#         """"""
-
-#     def optimize(self, img: Any) -> float:
-#         """"""
-#         list_transforms = []
-
-        
-#         attack_pipeline = AttackPipeline(
-#             model=self.model,
-#             list_transforms=list_transforms,
-#         )
-
-
-
-
 class OptunaAttackPipeline:
     """Pipeline-класс для поиска наилучших преобразований
-    входных данных, которые наилучшим образом обманывают модель."""
+    входных данных, которые наилучшим образом обманывают модель"""
 
     def __init__(
         self,
@@ -73,20 +45,15 @@ class OptunaAttackPipeline:
 
     def _objective(self, trial: optuna.Trial) -> float:
         """
-        Целевая функция для оптимизации.
-        :param trial: optuna для оптимизации.
-        :return: float - вероятность положительного класса.
+        Целевая функция для оптимизации
+        :param trial: optuna для оптимизации
+        :return: вероятность положительного класса
         """
         list_transforms = []
 
         for type_transform in self.list_type_transforms:
-            # Пример: конкретные параметры (нужно адаптировать под ваши трансформации)
-            # Если у трансформаций есть статический метод для предложения параметров, 
-            # лучше вызвать его: params = TransformClass.suggest_params(trial)
-
-            if hasattr(TransformClass, 'suggest_params'):
-                params = TransformClass.suggest_params(trial)
-                transform_instance = TransformClass(**params)
+            params = get_ranges2optuna(trial, type_transform)
+            transform_instance = type_transform(**params)
             list_transforms.append(transform_instance)
 
         attack_pipeline = AttackPipeline(
@@ -104,15 +71,15 @@ class OptunaAttackPipeline:
         study_name: str = 'attack_optimization',
         n_trials: int = 100, 
         timeout: int = None,
-        show_progress: bool = True
+        show_progress: bool = True,
     ) -> optuna.study.Study:
         """
-        Запускает оптимизацию гиперпараметров трансформаций.
+        Запускает оптимизацию гиперпараметров трансформаций
 
         :param img: изображение для атаки
         :param n_trials: количество итераций оптимизации
         :param timeout: лимит времени в секундах
-        :return: метаданные оптимизации optuna.study.Study
+        :return: метаданные оптимизации
         """
         # Сохраняем изображение для доступа из _objective
         self._current_img = img
