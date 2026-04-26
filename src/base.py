@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any
-from utils.utils import ArgRange
+from .utils.dataclasses import ArgRange
 
 
 class BaseModel(ABC):
@@ -32,8 +32,8 @@ class BaseTransform(ABC):
         :return: преобразованное изображение"""
         pass
 
-    @abstractmethod
     @staticmethod
+    @abstractmethod
     def get_ranges() -> dict[str, ArgRange]:
         """Возвращает диапазон допустимых аргументов.
         
