@@ -1,7 +1,7 @@
-from base import BaseModel, BaseTransform
+from .base import BaseModel, BaseTransform
 from typing import Any, Type, Literal
 import optuna
-from utils.utils import get_ranges2optuna
+from .utils.utils import get_ranges2optuna
 
 
 class AttackPipeline:
@@ -16,17 +16,20 @@ class AttackPipeline:
         self.model = model
         self.list_transforms = list_transforms
 
-    def attack(self, img: Any) -> float:
+    def attack(self, img: Any) -> dict[str, Any]:
         """Предсказание вероятности положительного класса при
         применённых преобразованиях данных.
 
         :param img: Any - изображение формата, с которым работает
         BaseTransform и BaseModel.
-        :return: float - вероятность положительного класса.
+        :return: словарь результирующих метаданных.
         """
         for transform in self.list_transforms:
             img = transform.transform(img)
-        return self.model.predict(img)
+        return {
+            'img': img,
+            'prob': self.model.predict(img),
+        }
 
 
 class OptunaAttackPipeline:
