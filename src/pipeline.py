@@ -64,7 +64,8 @@ class OptunaAttackPipeline:
             list_transforms=list_transforms,
         )
 
-        score = attack_pipeline.attack(self._current_img)
+        meta_dict = attack_pipeline.attack(self._current_img)
+        score = meta_dict['prob']
         return score
 
     def optimize(

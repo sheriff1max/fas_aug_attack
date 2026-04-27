@@ -35,8 +35,8 @@ def get_ranges2optuna(
                 )
                 right = trial.suggest_int(
                     f'{key}--right--{class_name}',
-                    left,
-                    arg_range.values[1],
+                    left + 1,
+                    arg_range.values[1] + 2,
                 )
             elif arg_range.data_type == DataType.FLOAT:
                 left = trial.suggest_float(
@@ -46,8 +46,8 @@ def get_ranges2optuna(
                 )
                 right = trial.suggest_float(
                     f'{key}--right--{class_name}',
-                    left,
-                    arg_range.values[1],
+                    left + 1e-6,
+                    arg_range.values[1] + 1e-5,
                 )
             else:
                 raise ValueError(f'key `{key}` has data_type = `{arg_range.data_type}`')
