@@ -31,23 +31,23 @@ def get_ranges2optuna(
                 left = trial.suggest_int(
                     f'{key}--left--{class_name}',
                     arg_range.values[0],
-                    arg_range.values[1],
+                    arg_range.values[1] - 2,
                 )
                 right = trial.suggest_int(
                     f'{key}--right--{class_name}',
                     left + 1,
-                    arg_range.values[1] + 2,
+                    arg_range.values[1],
                 )
             elif arg_range.data_type == DataType.FLOAT:
                 left = trial.suggest_float(
                     f'{key}--left--{class_name}',
                     arg_range.values[0],
-                    arg_range.values[1],
+                    arg_range.values[1] - 2e-6,
                 )
                 right = trial.suggest_float(
                     f'{key}--right--{class_name}',
                     left + 1e-6,
-                    arg_range.values[1] + 1e-5,
+                    arg_range.values[1],
                 )
             else:
                 raise ValueError(f'key `{key}` has data_type = `{arg_range.data_type}`')

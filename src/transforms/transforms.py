@@ -207,7 +207,7 @@ class ShiftScaleRotateTransform(BaseTransform):
     def get_ranges() -> dict[str, list]:
         return {
             'shift_limit': ArgRange(values=[-1., 1.], data_type=DataType.FLOAT, is_tuple=True),
-            'scale_limit': ArgRange(values=[-Inf.TINY.value, Inf.TINY.value], data_type=DataType.FLOAT, is_tuple=True),
+            'scale_limit': ArgRange(values=[0, Inf.TINY.value], data_type=DataType.FLOAT, is_tuple=True),
             'rotate_limit': ArgRange(values=[-360., 360.], data_type=DataType.FLOAT, is_tuple=True),
             'fill': ArgRange(values=[0, 255], data_type=DataType.INT)
         }
@@ -333,7 +333,7 @@ class GammaTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'gamma_limit': ArgRange(values=[0.1, Inf.BIG.value], data_type=DataType.FLOAT, is_tuple=True)
+            'gamma_limit': ArgRange(values=[1., Inf.MEDIUM.value], data_type=DataType.FLOAT, is_tuple=True)
         }
 
 
@@ -659,7 +659,7 @@ class SharpenTransform(BaseTransform):
         self.alpha = alpha
         self.lightness = lightness
         self.method = method
-        self.kernel_size = kernel_size
+        self.kernel_size = kernel_size + 1 if kernel_size % 2 == 0 else kernel_size
         self.sigma = sigma
         self.seed = seed
 
@@ -682,7 +682,7 @@ class SharpenTransform(BaseTransform):
             'alpha': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
             'lightness': ArgRange(values=[0., Inf.TINY.value], data_type=DataType.FLOAT, is_tuple=True),
             'method': ArgRange(values=['kernel', 'gaussian'], data_type=DataType.STR),
-            'kernel_size': ArgRange(values=[1, Inf.SMALL.value]),
+            'kernel_size': ArgRange(values=[3, Inf.SMALL.value], data_type=DataType.INT),
             'sigma': ArgRange(values=[0., Inf.TINY.value], data_type=DataType.FLOAT)
         }
 
@@ -1053,7 +1053,7 @@ class RainTransform(BaseTransform):
     def get_ranges() -> dict[str, list]:
         return {
             'rain_type': ArgRange(values=['drizzle', 'heavy', 'torrential'], data_type=DataType.STR),
-            'slant_range': ArgRange(values=[-180., 180.], data_type=DataType.FLOAT, is_tuple=True),
+            'slant_range': ArgRange(values=[-45., 45.], data_type=DataType.FLOAT, is_tuple=True),
             'drop_length': ArgRange(values=[1, Inf.SMALL.value], data_type=DataType.INT),
             'drop_width': ArgRange(values=[1, Inf.SMALL.value], data_type=DataType.INT),
             'blur_value': ArgRange(values=[1, Inf.SMALL.value], data_type=DataType.INT),
@@ -1151,7 +1151,7 @@ class ShadowTransform(BaseTransform):
     def get_ranges() -> dict[str, list]:
         return {
             'num_shadows_limit': ArgRange(values=[1, Inf.SMALL.value], data_type=DataType.INT, is_tuple=True),
-            'shadow_dimension': ArgRange(values=[0, Inf.SMALL.value], data_type=DataType.INT)
+            'shadow_dimension': ArgRange(values=[3, Inf.SMALL.value], data_type=DataType.INT)
         }
 
 
@@ -1260,11 +1260,11 @@ class SpatterTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'mean': ArgRange(values=[0., Inf.TINY.value], data_type=DataType.FLOAT, is_tuple=True),
-            'std': ArgRange(values=[0., Inf.TINY.value], data_type=DataType.FLOAT, is_tuple=True),
+            'mean': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
+            'std': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
             'gauss_sigma': ArgRange(values=[0., Inf.SMALL.value], data_type=DataType.FLOAT, is_tuple=True),
-            'cutout_threshold': ArgRange(values=[0., Inf.TINY.value], data_type=DataType.FLOAT, is_tuple=True),
-            'intensity': ArgRange(values=[0., Inf.TINY.value], data_type=DataType.FLOAT, is_tuple=True),
+            'cutout_threshold': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
+            'intensity': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
             'mode': ArgRange(values=['rain', 'mud'], data_type=DataType.STR)
         }
 
@@ -1303,7 +1303,7 @@ class ChromaticAberrationTransform(BaseTransform):
             'primary_distortion_limit': ArgRange(values=[-Inf.TINY.value, Inf.TINY.value], data_type=DataType.FLOAT, is_tuple=True),
             'secondary_distortion_limit': ArgRange(values=[-Inf.TINY.value, Inf.TINY.value], data_type=DataType.FLOAT, is_tuple=True),
             'mode': ArgRange(values=['green_purple', 'red_blue', 'random'], data_type=DataType.STR),
-            'interpolation': ArgRange(values=[0, 6], data_type=DataType.INT)
+            'interpolation': ArgRange(values=[cv2.INTER_NEAREST, cv2.INTER_LINEAR, cv2.INTER_CUBIC, cv2.INTER_AREA, cv2.INTER_LANCZOS4], data_type=DataType.INT)
         }
 
 
@@ -1394,40 +1394,6 @@ class MorphologicalTransform(BaseTransform):
         return {
             'scale': ArgRange(values=[1, Inf.SMALL.value], data_type=DataType.INT, is_tuple=True),
             'operation': ArgRange(values=['dilation', 'erosion'], data_type=DataType.STR)
-        }
-
-
-class PlanckianJitterTransform(BaseTransform):
-    def __init__(
-        self, 
-        mode: Literal['blackbody', 'cied'] = "blackbody",
-        temperature_limit: tuple[int, int] | None = None,
-        sampling_method: Literal['uniform', 'gaussian'] = "uniform",
-        seed: int = GLOBAL_SEED
-    ):
-        super().__init__()
-        self.mode = mode
-        self.temperature_limit = temperature_limit
-        self.sampling_method = sampling_method
-        self.seed = seed
-
-    def transform(self, img: Any) -> Any:
-        transform_pipeline = A.Compose([
-            A.PlanckianJitter(
-                mode=self.mode,
-                temperature_limit=self.temperature_limit,
-                sampling_method=self.sampling_method,
-                p=1
-            )
-        ], seed=self.seed)
-        return transform_pipeline(image=img)['image']
-
-    @staticmethod
-    def get_ranges() -> dict[str, list]:
-        return {
-            'mode': ArgRange(values=['blackbody', 'cied'], data_type=DataType.STR),
-            'temperature_limit': ArgRange(values=[3000, 15000], data_type=DataType.INT, is_tuple=True),
-            'sampling_method': ArgRange(values=['uniform', 'gaussian'], data_type=DataType.STR)
         }
 
 

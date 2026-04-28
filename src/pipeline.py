@@ -4,6 +4,9 @@ import optuna
 from .utils.utils import get_ranges2optuna
 
 
+optuna.logging.set_verbosity(optuna.logging.WARNING)
+
+
 class AttackPipeline:
     """Pipeline-класс, внутри которого хранятся модель
     и преобразования для изображений."""
@@ -50,6 +53,7 @@ class OptunaAttackPipeline:
         """
         Целевая функция для оптимизации
         :param trial: optuna для оптимизации
+
         :return: вероятность положительного класса
         """
         list_transforms = []
@@ -76,13 +80,19 @@ class OptunaAttackPipeline:
         n_trials: int = 100, 
         timeout: int = None,
         show_progress: bool = True,
+        catch: tuple[type[Exception]] | type[Exception] = (),
     ) -> optuna.study.Study:
         """
         Запускает оптимизацию гиперпараметров трансформаций
 
         :param img: изображение для атаки
+        :param direction: направление оптимизации
+        :param study_name: название эксперимента оптимизации
         :param n_trials: количество итераций оптимизации
         :param timeout: лимит времени в секундах
+        :param show_progress: показывать прогресс оптимизации или нет
+        :param catch: какие ошибки отлавливать при оптимизации (ValueError и т.д.)
+
         :return: метаданные оптимизации
         """
         # Сохраняем изображение для доступа из _objective
@@ -97,7 +107,8 @@ class OptunaAttackPipeline:
             self._objective, 
             n_trials=n_trials, 
             timeout=timeout,
-            show_progress_bar=show_progress
+            show_progress_bar=show_progress,
+            catch=catch,
         )
 
         # Очищаем временное изображение
