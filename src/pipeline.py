@@ -2,6 +2,7 @@ from .base import BaseModel, BaseTransform
 from typing import Any, Type, Literal
 import optuna
 from .utils.utils import get_ranges2optuna
+from .utils.logging import LoggerOptuna
 
 
 optuna.logging.set_verbosity(optuna.logging.WARNING)
@@ -31,7 +32,7 @@ class AttackPipeline:
             img = transform.transform(img)
         return {
             'img': img,
-            'prob': self.model.predict(img),
+            'score': self.model.predict(img),
         }
 
 
@@ -43,9 +44,11 @@ class OptunaAttackPipeline:
         self,
         model: BaseModel,
         list_type_transforms: list[Type[BaseTransform]],
+        logger: LoggerOptuna = None,
     ):
         self.model = model
         self.list_type_transforms = list_type_transforms
+        self.logger = logger
         # Временное хранилище для изображения в процессе оптимизации
         self._current_img = None
 
@@ -69,7 +72,14 @@ class OptunaAttackPipeline:
         )
 
         meta_dict = attack_pipeline.attack(self._current_img)
-        score = meta_dict['prob']
+        score = meta_dict['score']
+
+        if self.logger:
+            self.logger.step(
+                score=score,
+                img=meta_dict['img'],
+                step=trial.number
+            )
         return score
 
     def optimize(
@@ -92,9 +102,13 @@ class OptunaAttackPipeline:
         :param timeout: лимит времени в секундах
         :param show_progress: показывать прогресс оптимизации или нет
         :param catch: какие ошибки отлавливать при оптимизации (ValueError и т.д.)
+        :param logger:
 
         :return: метаданные оптимизации
         """
+        if self.logger:
+            self.logger.start()
+
         # Сохраняем изображение для доступа из _objective
         self._current_img = img
 
@@ -113,5 +127,8 @@ class OptunaAttackPipeline:
 
         # Очищаем временное изображение
         self._current_img = None
+
+        if self.logger:
+            self.logger.end()
 
         return study
