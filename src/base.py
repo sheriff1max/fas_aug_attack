@@ -46,7 +46,12 @@ class BaseTransform(ABC):
 
 class BasePipelineAttackOptuna(ABC):
     """Абстрактный класс для нахождения лучших
-    атак на модели с помощью Optuna."""
+    атак на модели с помощью Optuna.
+    
+    :param model: модель для атаки
+    :param list_type_transforms: список типов-трансформаторов изображений
+    :param logger: объект для логгирование экспериментов
+    """
 
     def __init__(
         self,
@@ -58,7 +63,10 @@ class BasePipelineAttackOptuna(ABC):
         self.list_type_transforms = list_type_transforms
         self.logger = logger
 
-    @staticmethod
+        # Временное хранилище data, сохранённое в self.optimize(...)
+        self._data = None
+
+    @abstractmethod
     def _objective(self, trial: optuna.Trial) -> float:
         """Целевая функция для оптимизации
 
