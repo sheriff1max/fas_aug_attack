@@ -1,5 +1,4 @@
 venv/
 __pycache__
 .ipynb_checkpoints
-*.db
-test_logging_*/
+logs*/

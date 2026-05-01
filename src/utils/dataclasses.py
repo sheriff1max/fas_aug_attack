@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 from .enums import DataType
 
 
@@ -16,7 +17,13 @@ class ArgRange:
     :param data_type: тип данных у диапазона.
     :param is_tuple: аргумент состоит из одного числа или множества.
     """
-
     values: list[int | float | str]
     data_type: DataType
     is_tuple: bool = False
+
+
+@dataclass
+class ResponsePipelineAttackImg:
+    """"""
+    img: Any
+    score: float

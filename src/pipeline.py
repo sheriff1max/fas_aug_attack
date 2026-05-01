@@ -3,12 +3,14 @@ from typing import Any, Type, Literal
 import optuna
 from .utils.utils import get_ranges2optuna
 from .utils.logging import LoggerOptuna
+from .utils.dataclasses import ResponsePipelineAttackImg
+from optuna.importance import get_param_importances
 
 
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 
-class AttackPipeline:
+class PipelineAttackImg:
     """Pipeline-класс, внутри которого хранятся модель
     и преобразования для изображений."""
 
@@ -20,7 +22,7 @@ class AttackPipeline:
         self.model = model
         self.list_transforms = list_transforms
 
-    def attack(self, img: Any) -> dict[str, Any]:
+    def attack(self, img: Any) -> ResponsePipelineAttackImg:
         """Предсказание вероятности положительного класса при
         применённых преобразованиях данных.
 
@@ -30,13 +32,13 @@ class AttackPipeline:
         """
         for transform in self.list_transforms:
             img = transform.transform(img)
-        return {
-            'img': img,
-            'score': self.model.predict(img),
-        }
+        return ResponsePipelineAttackImg(
+            img=img,
+            score=self.model.predict(img)
+        )
 
 
-class OptunaAttackPipeline:
+class OptunaPipelineAttackImgOptuna:
     """Pipeline-класс для поиска наилучших преобразований
     входных данных, которые наилучшим образом обманывают модель"""
 
@@ -66,19 +68,20 @@ class OptunaAttackPipeline:
             transform_instance = type_transform(**params)
             list_transforms.append(transform_instance)
 
-        attack_pipeline = AttackPipeline(
+        attack_pipeline = PipelineAttackImg(
             model=self.model,
             list_transforms=list_transforms,
         )
 
-        meta_dict = attack_pipeline.attack(self._current_img)
-        score = meta_dict['score']
+        response = attack_pipeline.attack(self._current_img)
+        score = response.score
 
         if self.logger:
             self.logger.step(
+                img=response.img,
                 score=score,
-                img=meta_dict['img'],
-                step=trial.number
+                step=trial.number,
+                params=trial.params,
             )
         return score
 
@@ -86,7 +89,6 @@ class OptunaAttackPipeline:
         self, 
         img: Any,
         direction: Literal['minimize', 'maximize'] = 'minimize',
-        study_name: str = 'attack_optimization',
         n_trials: int = 100, 
         timeout: int = None,
         show_progress: bool = True,
@@ -97,12 +99,10 @@ class OptunaAttackPipeline:
 
         :param img: изображение для атаки
         :param direction: направление оптимизации
-        :param study_name: название эксперимента оптимизации
         :param n_trials: количество итераций оптимизации
         :param timeout: лимит времени в секундах
         :param show_progress: показывать прогресс оптимизации или нет
         :param catch: какие ошибки отлавливать при оптимизации (ValueError и т.д.)
-        :param logger:
 
         :return: метаданные оптимизации
         """
@@ -114,7 +114,6 @@ class OptunaAttackPipeline:
 
         study = optuna.create_study(
             direction=direction,
-            study_name=study_name,
         )
 
         study.optimize(
@@ -125,10 +124,14 @@ class OptunaAttackPipeline:
             catch=catch,
         )
 
+        if self.logger:
+            self.logger.end(dict_importance=get_param_importances(study))
+
         # Очищаем временное изображение
         self._current_img = None
 
-        if self.logger:
-            self.logger.end()
-
         return study
+
+
+class OptunaPipelineAttackDatasetOptuna:
+    """"""
