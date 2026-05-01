@@ -10,27 +10,31 @@ class AttackDataset:
     Dataset class for structure:
 
     - dataset_folder
-
         - domain_1
             - img_1.jpg
             - ...
             - img_N.jpg
-        
         - ...
             - ...
-        
         - domain_K
             - img_1.jpg
             - ...
             - img_M.jpg
+
+    :param path: путь до датасета с доменами атак
+    :param exclude_folders: список названий доменов, которые исключить
     """
-    def __init__(self, path: str):
+    def __init__(
+        self,
+        path: str,
+        exclude_folders: list[str],
+    ):
         self.path = Path(path)
         
         self.db = dict()
         i = 0
         for folder in os.listdir(path):
-            if '.' not in folder:
+            if '.' not in folder and folder not in exclude_folders:
                 for filename in os.listdir(self.path / folder):
                     path2file = self.path / folder / filename
                     self.db[i] = path2file

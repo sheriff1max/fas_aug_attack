@@ -24,6 +24,10 @@ class ArgRange:
 
 @dataclass
 class ResponsePipelineAttackImg:
-    """"""
+    """Класс для ответа пайплайна для одного изображения.
+    
+    :param img: преобразованное изображение
+    :param score: ответ модели
+    """
     img: Any
     score: float
