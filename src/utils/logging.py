@@ -5,7 +5,7 @@ import numpy as np
 from typing import Any, Literal
 from collections import defaultdict
 import pandas as pd
-from .utils import save_plot, save_importance_barh
+from .plots import save_plot, save_importance_barh
 
 
 class LoggerOptuna:

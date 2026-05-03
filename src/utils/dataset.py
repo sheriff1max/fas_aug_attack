@@ -27,7 +27,7 @@ class AttackDataset:
     def __init__(
         self,
         path: str,
-        exclude_folders: list[str],
+        exclude_folders: list[str] = [],
     ):
         self.path = Path(path)
         

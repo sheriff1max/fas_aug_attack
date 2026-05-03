@@ -888,7 +888,7 @@ class CoarseDropoutTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'num_holes_range': ArgRange(values=[0, Inf.LARGE.value], data_type=DataType.INT, is_tuple=True),
+            'num_holes_range': ArgRange(values=[1, Inf.LARGE.value], data_type=DataType.INT, is_tuple=True),
             'hole_height_range': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
             'hole_width_range': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
             'fill': ArgRange(values=[0, 255], data_type=DataType.INT)

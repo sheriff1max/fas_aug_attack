@@ -78,7 +78,7 @@ class PipelineAttackOptunaImg(BasePipelineAttackOptuna):
             list_transforms=list_transforms,
         )
 
-        response = attack_pipeline.attack(self._current_img)
+        response = attack_pipeline.attack(self._data)
         score = response.score
 
         if self.logger:
