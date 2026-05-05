@@ -6,6 +6,7 @@ from typing import Any, Literal
 from collections import defaultdict
 import pandas as pd
 from .plots import save_plot, save_importance_barh
+import optuna
 
 
 class LoggerOptuna:
@@ -192,3 +193,45 @@ class LoggerOptuna:
         if not self._check_start:
             raise Exception('You should call .start() firstly.')
         
+
+def get_param_importances(study: optuna.Study) -> dict[str, float]:
+    """
+    Кастомный расчет важности параметров с учетом условных параметров
+
+    :param study:
+    :return:
+    """
+    all_params = set()
+    for trial in study.trials:
+        if trial.state == optuna.trial.TrialState.COMPLETE:
+            all_params.update(trial.params.keys())
+
+    importances = {}
+    for param in all_params:
+        # Считаем важность только по триалам где параметр присутствует
+        values = []
+        targets = []
+
+        for trial in study.trials:
+            if trial.state == optuna.trial.TrialState.COMPLETE:
+                if param in trial.params:
+                    values.append(trial.params[param])
+                    targets.append(trial.value)
+
+        if len(values) > 1:
+            values_arr = np.array(values)
+            targets_arr = np.array(targets)
+            
+            # Корреляция между параметром и целевой функцией
+            if len(np.unique(values_arr)) > 1:
+                correlation = np.abs(np.corrcoef(values_arr, targets_arr)[0, 1])
+                importances[param] = correlation if not np.isnan(correlation) else 0
+            else:
+                importances[param] = 0
+        else:
+            importances[param] = 0
+    
+    total = sum(importances.values())
+    if total > 0:
+        importances = {k: v / total for k, v in importances.items()}
+    return importances

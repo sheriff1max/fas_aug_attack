@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Type, Literal
 from .utils.dataclasses import ArgRange
-from .utils.logging import LoggerOptuna
+from .utils.logging import LoggerOptuna, get_param_importances
 import optuna
 
 
@@ -58,10 +58,12 @@ class BasePipelineAttackOptuna(ABC):
         model: BaseModel,
         list_type_transforms: list[Type[BaseTransform]],
         logger: LoggerOptuna = None,
+        optimize_set_transforms: bool = False
     ):
         self.model = model
         self.list_type_transforms = list_type_transforms
         self.logger = logger
+        self.optimize_set_transforms = optimize_set_transforms
 
         # Временное хранилище data, сохранённое в self.optimize(...)
         self._data = None
@@ -112,7 +114,8 @@ class BasePipelineAttackOptuna(ABC):
         )
 
         if self.logger:
-            dict_importance = optuna.importance.get_param_importances(study)
+            # dict_importance = optuna.importance.get_param_importances(study)
+            dict_importance = get_param_importances(study)
             self.logger.end(dict_importance=dict_importance)
 
         self._data = None

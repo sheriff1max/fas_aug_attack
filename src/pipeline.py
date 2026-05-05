@@ -1,5 +1,5 @@
 from .base import BaseModel, BaseTransform, BasePipelineAttackOptuna
-from .utils.utils import get_ranges2optuna
+from .utils.utils import make_list_transforms_optuna
 from .utils.logging import LoggerOptuna
 from .utils.dataclasses import ResponsePipelineAttackImg
 
@@ -52,11 +52,13 @@ class PipelineAttackOptunaImg(BasePipelineAttackOptuna):
         model: BaseModel,
         list_type_transforms: list[Type[BaseTransform]],
         logger: LoggerOptuna = None,
+        optimize_set_transforms: bool = False,
     ):
         super().__init__(
             model=model,
             list_type_transforms=list_type_transforms,
             logger=logger,
+            optimize_set_transforms=optimize_set_transforms,
         )
         self._data = None
 
@@ -66,12 +68,11 @@ class PipelineAttackOptunaImg(BasePipelineAttackOptuna):
         :param trial: optuna для оптимизации
         :return: уверенность модели
         """
-        list_transforms = []
-
-        for type_transform in self.list_type_transforms:
-            params = get_ranges2optuna(trial, type_transform)
-            transform_instance = type_transform(**params)
-            list_transforms.append(transform_instance)
+        list_transforms = make_list_transforms_optuna(
+            trial=trial,
+            list_type_transforms=self.list_type_transforms,
+            optimize_set_transforms=self.optimize_set_transforms,
+        )
 
         attack_pipeline = PipelineAttackImg(
             model=self.model,
@@ -102,11 +103,13 @@ class PipelineAttackOptunaDataset(BasePipelineAttackOptuna):
         model: BaseModel,
         list_type_transforms: list[Type[BaseTransform]],
         logger: LoggerOptuna = None,
+        optimize_set_transforms: bool = False,
     ):
         super().__init__(
             model=model,
             list_type_transforms=list_type_transforms,
             logger=logger,
+            optimize_set_transforms=optimize_set_transforms,
         )
         self._data = None
 
@@ -116,12 +119,11 @@ class PipelineAttackOptunaDataset(BasePipelineAttackOptuna):
         :param trial: optuna для оптимизации
         :return: уверенность модели
         """
-        list_transforms = []
-
-        for type_transform in self.list_type_transforms:
-            params = get_ranges2optuna(trial, type_transform)
-            transform_instance = type_transform(**params)
-            list_transforms.append(transform_instance)
+        list_transforms = make_list_transforms_optuna(
+            trial=trial,
+            list_type_transforms=self.list_type_transforms,
+            optimize_set_transforms=self.optimize_set_transforms,
+        )
 
         attack_pipeline = PipelineAttackImg(
             model=self.model,

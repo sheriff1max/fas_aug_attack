@@ -6,3 +6,4 @@
 - [x] Добавить в класс Dataset загрузку конкретных доменов.
 - [] Сделать BaseDataset. Сделать ResponseDataset
 - [] Ограничить типы в BasePipelineAttackOptuna.optimize() на numpy | BaseDataset
+- [] Добавить в OptunaPipelines метрику на данных без всяких преобразований, чтобы в будущем сравнить с оптимизациями.
