@@ -7,14 +7,13 @@ from ..base import BaseTransform
 
 def make_list_transforms_optuna(
     trial: optuna.Trial,
-    list_type_transforms: list[list[Type[BaseTransform]]],
+    list_type_transforms: list[list[Type[BaseTransform] | None]],
 ) -> list[BaseTransform]:
     """Функция создаёт объекты преобразований с оптимальными
     параметрами, оптимизированных с помощью Optuna
 
     :param trial:
     :param list_type_transforms: список списков типов трансформации (не объектов)
-    :param optimize_set_transforms: оптимизировать ли набор трансформаторов
 
     :return: список преобразований с оптимальными аргументами
     """
@@ -31,12 +30,14 @@ def make_list_transforms_optuna(
             idx_choice = 0
 
         type_transform = sublist_type_transforms[idx_choice]
-        params = get_ranges2optuna(
-            trial=trial,
-            type_transform=type_transform,
-        )
-        transform_instance = type_transform(**params)
-        list_transforms.append(transform_instance)
+        if type_transform:
+            params = get_ranges2optuna(
+                trial=trial,
+                type_transform=type_transform,
+            )
+            transform_instance = type_transform(**params)
+            list_transforms.append(transform_instance)
+
     return list_transforms
 
 

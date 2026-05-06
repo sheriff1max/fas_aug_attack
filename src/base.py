@@ -56,7 +56,7 @@ class BasePipelineAttackOptuna(ABC):
     def __init__(
         self,
         model: BaseModel,
-        list_type_transforms: list[list[Type[BaseTransform]]],
+        list_type_transforms: list[list[Type[BaseTransform] | None]],
         logger: LoggerOptuna = None,
     ):
         self.model = model

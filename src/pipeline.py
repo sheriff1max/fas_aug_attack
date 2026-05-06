@@ -50,7 +50,7 @@ class PipelineAttackOptunaImg(BasePipelineAttackOptuna):
     def __init__(
         self,
         model: BaseModel,
-        list_type_transforms: list[list[Type[BaseTransform]]],
+        list_type_transforms: list[list[Type[BaseTransform] | None]],
         logger: LoggerOptuna = None,
     ):
         super().__init__(
@@ -113,7 +113,7 @@ class PipelineAttackOptunaDataset(BasePipelineAttackOptuna):
     def __init__(
         self,
         model: BaseModel,
-        list_type_transforms: list[list[Type[BaseTransform]]],
+        list_type_transforms: list[list[Type[BaseTransform] | None]],
         logger: LoggerOptuna = None,
     ):
         super().__init__(
