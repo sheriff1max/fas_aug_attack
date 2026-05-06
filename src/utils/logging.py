@@ -224,7 +224,7 @@ def get_param_importances(study: optuna.Study) -> dict[str, float]:
                     targets.append(trial.value)
 
         if len(values) > 1:
-            values_arr = np.array(values, dtype=np.float64)
+            values_arr = np.array(values)
             targets_arr = np.array(targets, dtype=np.float64)
 
             # Корреляция между параметром и целевой функцией
