@@ -10,6 +10,8 @@ from ..utils.dataclasses import ArgRange
 GLOBAL_SEED = 42
 
 
+## Geometric transformations
+
 class ShearTransform(BaseTransform):
     def __init__(
         self,
@@ -212,6 +214,8 @@ class ShiftScaleRotateTransform(BaseTransform):
             'fill': ArgRange(values=[0, 255], data_type=DataType.INT)
         }
 
+
+## Color transformations
 
 class BrightnessContrastTransform(BaseTransform):
     def __init__(
@@ -525,6 +529,8 @@ class ToSepiaTransform(BaseTransform):
         return {}
 
 
+## Transformations of blurring and sharpness
+
 class BlurTransform(BaseTransform):
     def __init__(
         self,
@@ -755,6 +761,8 @@ class EmbossTransform(BaseTransform):
         }
 
 
+## Noise transforms
+
 class GaussNoiseTransform(BaseTransform):
     def __init__(
         self, 
@@ -857,6 +865,8 @@ class ISONoiseTransform(BaseTransform):
         }
 
 
+## Dropout transforms
+
 class CoarseDropoutTransform(BaseTransform):
     def __init__(
         self, 
@@ -928,6 +938,8 @@ class GridDropoutTransform(BaseTransform):
             'fill': ArgRange(values=[0, 255], data_type=DataType.INT)
         }
 
+
+## Transformation of compression and artifacts
 
 class CompressionTransform(BaseTransform):
     def __init__(
@@ -1014,6 +1026,8 @@ class PixelDropoutTransform(BaseTransform):
             'per_channel': ArgRange(values=[False, True], data_type=DataType.BOOL),
         }
 
+
+## Weather and atmospheric conditions
 
 class RainTransform(BaseTransform):
     def __init__(
@@ -1366,6 +1380,8 @@ class ZoomBlurTransform(BaseTransform):
             'step_factor': ArgRange(values=[0., Inf.TINY.value], data_type=DataType.FLOAT, is_tuple=True),
         }
 
+
+## Advanced transformations
 
 class MorphologicalTransform(BaseTransform):
     def __init__(

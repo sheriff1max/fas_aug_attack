@@ -50,15 +50,13 @@ class PipelineAttackOptunaImg(BasePipelineAttackOptuna):
     def __init__(
         self,
         model: BaseModel,
-        list_type_transforms: list[Type[BaseTransform]],
+        list_type_transforms: list[list[Type[BaseTransform]]],
         logger: LoggerOptuna = None,
-        optimize_set_transforms: bool = False,
     ):
         super().__init__(
             model=model,
             list_type_transforms=list_type_transforms,
             logger=logger,
-            optimize_set_transforms=optimize_set_transforms,
         )
         self._data = None
 
@@ -71,7 +69,6 @@ class PipelineAttackOptunaImg(BasePipelineAttackOptuna):
         list_transforms = make_list_transforms_optuna(
             trial=trial,
             list_type_transforms=self.list_type_transforms,
-            optimize_set_transforms=self.optimize_set_transforms,
         )
 
         attack_pipeline = PipelineAttackImg(
@@ -116,15 +113,13 @@ class PipelineAttackOptunaDataset(BasePipelineAttackOptuna):
     def __init__(
         self,
         model: BaseModel,
-        list_type_transforms: list[Type[BaseTransform]],
+        list_type_transforms: list[list[Type[BaseTransform]]],
         logger: LoggerOptuna = None,
-        optimize_set_transforms: bool = False,
     ):
         super().__init__(
             model=model,
             list_type_transforms=list_type_transforms,
             logger=logger,
-            optimize_set_transforms=optimize_set_transforms,
         )
         self._data = None
 
@@ -137,7 +132,6 @@ class PipelineAttackOptunaDataset(BasePipelineAttackOptuna):
         list_transforms = make_list_transforms_optuna(
             trial=trial,
             list_type_transforms=self.list_type_transforms,
-            optimize_set_transforms=self.optimize_set_transforms,
         )
 
         attack_pipeline = PipelineAttackImg(

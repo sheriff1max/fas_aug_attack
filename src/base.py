@@ -49,21 +49,19 @@ class BasePipelineAttackOptuna(ABC):
     атак на модели с помощью Optuna.
     
     :param model: модель для атаки
-    :param list_type_transforms: список типов-трансформаторов изображений
+    :param list_type_transforms: список списков типов-трансформаторов изображений
     :param logger: объект для логгирование экспериментов
     """
 
     def __init__(
         self,
         model: BaseModel,
-        list_type_transforms: list[Type[BaseTransform]],
+        list_type_transforms: list[list[Type[BaseTransform]]],
         logger: LoggerOptuna = None,
-        optimize_set_transforms: bool = False
     ):
         self.model = model
         self.list_type_transforms = list_type_transforms
         self.logger = logger
-        self.optimize_set_transforms = optimize_set_transforms
 
         # Временное хранилище data, сохранённое в self.optimize(...)
         self._data = None
