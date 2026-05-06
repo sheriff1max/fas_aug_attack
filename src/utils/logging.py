@@ -124,8 +124,16 @@ class LoggerOptuna:
             ascending=True if self.direction == 'minimize' else False
         )
         best_params = best_row.loc[0, 'params']
+        best_params = {key: value for key, value in best_params.items() if 'idx_choice' not in key}
+        best_transforms = list(set(
+            [key.split('--')[-1] for key in best_row.loc[0, 'params'].keys() if 'idx_choice' not in key]
+        ))
         best_score = best_row.loc[0, 'score']
-        data = {'best_params': best_params, 'best_score': best_score}
+        data = {
+            'best_params': best_params,
+            'best_score': best_score,
+            'best_transforms': best_transforms
+        }
         self.save_json(data=data, filename=self.FILENAME_BEST_PARAMS)
 
         # График важности параметров.
@@ -146,6 +154,7 @@ class LoggerOptuna:
             title='Важность параметров на атаки',
             xlabel='Важность',
             ylabel='Параметр',
+            figsize=(13, 5),
         )
 
     def _save_image(
@@ -176,7 +185,7 @@ class LoggerOptuna:
         """
         if not self._meta_saved:
             list_transforms = list(set([
-                param.split('--')[-1] for param in params
+                param.split('--')[-1] for param in params if 'Transform' in param
             ]))
             data = {
                 'list_transforms': list_transforms,
