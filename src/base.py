@@ -111,13 +111,16 @@ class BasePipelineAttackOptuna(ABC):
             direction=direction,
         )
 
-        study.optimize(
-            self._objective, 
-            n_trials=n_trials, 
-            timeout=timeout,
-            show_progress_bar=show_progress,
-            catch=catch,
-        )
+        try:
+            study.optimize(
+                self._objective, 
+                n_trials=n_trials, 
+                timeout=timeout,
+                show_progress_bar=show_progress,
+                catch=catch,
+            )
+        except KeyboardInterrupt:
+            print('Optimizing is ends!')
 
         if self.logger:
             # dict_importance = optuna.importance.get_param_importances(study)

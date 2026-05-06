@@ -118,7 +118,11 @@ class LoggerOptuna:
         )
 
         # Сохранение лучших найденных параметров для атаки на модель.
-        best_row: pd.DataFrame = df_score.sort_values(by='score', ignore_index=True)
+        best_row: pd.DataFrame = df_score.sort_values(
+            by='score',
+            ignore_index=True,
+            ascending=True if self.direction == 'minimize' else False
+        )
         best_params = best_row.loc[0, 'params']
         best_score = best_row.loc[0, 'score']
         data = {'best_params': best_params, 'best_score': best_score}
