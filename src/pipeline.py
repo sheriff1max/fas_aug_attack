@@ -91,6 +91,21 @@ class PipelineAttackOptunaImg(BasePipelineAttackOptuna):
             )
         return score
 
+    def baseline(self, data: Any) -> float:
+        """"""
+        attack_pipeline = PipelineAttackImg(
+            model=self.model,
+            list_transforms=[],
+        )
+
+        response = attack_pipeline.attack(data)
+        score = response.score
+
+        self.logger.save_json(
+            data={'score': score, 'description': 'score on one image'},
+            filename='baseline_score.json',
+        )
+
 
 class PipelineAttackOptunaDataset(BasePipelineAttackOptuna):
     """Pipeline-класс для поиска наилучших преобразований,
@@ -147,4 +162,28 @@ class PipelineAttackOptunaDataset(BasePipelineAttackOptuna):
                 step=trial.number,
                 params=trial.params,
             )
+        return score
+
+    def baseline(self, data: Any) -> float:
+        """"""
+        attack_pipeline = PipelineAttackImg(
+            model=self.model,
+            list_transforms=[],
+        )
+
+        # Подсчёт score на исходных изображениях без преобразований.
+        list_scores = []
+        for i in range(len(data)):
+            img = data[i]['img']
+            response = attack_pipeline.attack(img)
+            score = response.score
+
+            list_scores.append(score)
+
+        score = np.mean(list_scores)
+        self.logger.save_json(
+            data={'score': score, 'description': 'mean by dataset'},
+            filename='baseline_score.json',
+        )
+
         return score

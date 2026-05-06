@@ -122,10 +122,7 @@ class LoggerOptuna:
         best_params = best_row.loc[0, 'params']
         best_score = best_row.loc[0, 'score']
         data = {'best_params': best_params, 'best_score': best_score}
-
-        path2best_params = self._cur_run_path / self.FILENAME_BEST_PARAMS
-        with open(path2best_params, "w") as f:
-            json.dump(data, f)
+        self.save_json(data=data, filename=self.FILENAME_BEST_PARAMS)
 
         # График важности параметров.
         df_importance = pd.DataFrame(
@@ -182,17 +179,25 @@ class LoggerOptuna:
                 'description': self.description,
             }
 
-            path2meta = self._cur_run_path / self.FILENAME_METAINFO
-            with open(path2meta, "w") as f:
-                json.dump(data, f)
-
+            self.save_json(data=data, filename=self.FILENAME_METAINFO)
             self._meta_saved = True
+
+    def save_json(
+        self,
+        data: dict | list,
+        filename: str,
+    ) -> None:
+        """"""
+        path = self._cur_run_path / filename
+        with open(path, "w") as f:
+            json.dump(data, f)
+
 
     def _check_start(self) -> None:
         """"""
         if not self._check_start:
             raise Exception('You should call .start() firstly.')
-        
+
 
 def get_param_importances(study: optuna.Study) -> dict[str, float]:
     """
@@ -219,9 +224,9 @@ def get_param_importances(study: optuna.Study) -> dict[str, float]:
                     targets.append(trial.value)
 
         if len(values) > 1:
-            values_arr = np.array(values)
-            targets_arr = np.array(targets)
-            
+            values_arr = np.array(values, dtype=np.float64)
+            targets_arr = np.array(targets, dtype=np.float64)
+
             # Корреляция между параметром и целевой функцией
             if len(np.unique(values_arr)) > 1:
                 correlation = np.abs(np.corrcoef(values_arr, targets_arr)[0, 1])
@@ -230,7 +235,7 @@ def get_param_importances(study: optuna.Study) -> dict[str, float]:
                 importances[param] = 0
         else:
             importances[param] = 0
-    
+
     total = sum(importances.values())
     if total > 0:
         importances = {k: v / total for k, v in importances.items()}

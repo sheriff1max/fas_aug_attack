@@ -76,6 +76,10 @@ class BasePipelineAttackOptuna(ABC):
         :return: уверенность модели
         """
 
+    @abstractmethod
+    def baseline(self, data: Any) -> float:
+        """"""
+
     def optimize(
         self, 
         data: Any,
@@ -97,6 +101,8 @@ class BasePipelineAttackOptuna(ABC):
         """
         if self.logger:
             self.logger.start()
+            # Подсчёт базового score на исходных данных
+            self.baseline(data=data)
 
         # Сохраняем данные для доступа из _objective
         self._data = data
