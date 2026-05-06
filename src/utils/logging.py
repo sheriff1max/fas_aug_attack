@@ -223,9 +223,14 @@ def get_param_importances(study: optuna.Study) -> dict[str, float]:
                     values.append(trial.params[param])
                     targets.append(trial.value)
 
+        # Категориальные признаки в числа.
+        if values and isinstance(values[0], str):
+            uniq_dict = {val: i for i, val in enumerate(np.unique(values))}
+            values = [uniq_dict[val] for val in values]
+        
         if len(values) > 1:
             values_arr = np.array(values)
-            targets_arr = np.array(targets, dtype=np.float64)
+            targets_arr = np.array(targets)
 
             # Корреляция между параметром и целевой функцией
             if len(np.unique(values_arr)) > 1:
