@@ -13,8 +13,9 @@ class DataType(Enum):
 class Inf(Enum):
     """Enum для ограничения `бесконечных` диапазонов
     подбираемых аргументов."""
-    TINY = 3
-    SMALL = 10
-    MEDIUM = 25
-    BIG = 50
-    LARGE = 100
+    TINY_VERY = 2
+    TINY = 25
+    SMALL = 100
+    MEDIUM = 250
+    BIG = 500
+    LARGE = 900
