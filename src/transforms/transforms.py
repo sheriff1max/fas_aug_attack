@@ -714,7 +714,6 @@ class GaussNoiseTransform(BaseTransform):
             'std_range': ArgRange(values=[0., 0.2], data_type=DataType.FLOAT, is_tuple=True),
             'mean_range': ArgRange(values=[-0.2, 0.2], data_type=DataType.FLOAT, is_tuple=True),
             'per_channel': ArgRange(values=[False, True], data_type=DataType.BOOL),
-            'noise_scale_factor': ArgRange(values=[0., 1.], data_type=DataType.FLOAT)
         }
 
 
