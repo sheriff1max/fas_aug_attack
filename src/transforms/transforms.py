@@ -10,8 +10,6 @@ from ..utils.dataclasses import ArgRange
 GLOBAL_SEED = 42
 
 
-## Geometric transformations
-
 class ShearTransform(BaseTransform):
     def __init__(
         self,
@@ -136,7 +134,7 @@ class OpticalDistortionTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'distort_limit': ArgRange(values=[-Inf.TINY.value, Inf.TINY.value], data_type=DataType.FLOAT, is_tuple=True),
+            'distort_limit': ArgRange(values=[-Inf.TINY_VERY.value, Inf.TINY_VERY.value], data_type=DataType.FLOAT, is_tuple=True),
             'fill': ArgRange(values=[0, 255], data_type=DataType.INT)
         }
 
@@ -173,14 +171,12 @@ class ShiftScaleRotateTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'shift_limit': ArgRange(values=[-1., 1.], data_type=DataType.FLOAT, is_tuple=True),
-            'scale_limit': ArgRange(values=[0, Inf.TINY_VERY.value], data_type=DataType.FLOAT, is_tuple=True),
+            'shift_limit': ArgRange(values=[-0.2, 0.2], data_type=DataType.FLOAT, is_tuple=True),
+            'scale_limit': ArgRange(values=[0, 1], data_type=DataType.FLOAT, is_tuple=True),
             'rotate_limit': ArgRange(values=[-360., 360.], data_type=DataType.FLOAT, is_tuple=True),
             'fill': ArgRange(values=[0, 255], data_type=DataType.INT)
         }
 
-
-## Color transformations
 
 class BrightnessContrastTransform(BaseTransform):
     def __init__(
@@ -207,8 +203,8 @@ class BrightnessContrastTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'brightness_limit': ArgRange(values=[-1., 1.], data_type=DataType.FLOAT, is_tuple=True),
-            'contrast_limit': ArgRange(values=[-1., 1.], data_type=DataType.FLOAT, is_tuple=True)
+            'brightness_limit': ArgRange(values=[-0.2, 0.2], data_type=DataType.FLOAT, is_tuple=True),
+            'contrast_limit': ArgRange(values=[-0.2, 0.2], data_type=DataType.FLOAT, is_tuple=True)
         }
 
 
@@ -242,7 +238,7 @@ class HSVTransform(BaseTransform):
         return {
             'hue_shift_limit': ArgRange(values=[-180., 180.], data_type=DataType.FLOAT, is_tuple=True),
             'sat_shift_limit': ArgRange(values=[-255., 255.], data_type=DataType.FLOAT, is_tuple=True),
-            'val_shift_limit': ArgRange(values=[-255., 255.], data_type=DataType.FLOAT, is_tuple=True)
+            'val_shift_limit': ArgRange(values=[-80., 80.], data_type=DataType.FLOAT, is_tuple=True)
         }
 
 
@@ -274,9 +270,9 @@ class RGBShiftTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'r_shift_limit': ArgRange(values=[-255., 255.], data_type=DataType.FLOAT, is_tuple=True),
-            'g_shift_limit': ArgRange(values=[-255., 255.], data_type=DataType.FLOAT, is_tuple=True),
-            'b_shift_limit': ArgRange(values=[-255., 255.], data_type=DataType.FLOAT, is_tuple=True),
+            'r_shift_limit': ArgRange(values=[-80., 80.], data_type=DataType.FLOAT, is_tuple=True),
+            'g_shift_limit': ArgRange(values=[-80., 80.], data_type=DataType.FLOAT, is_tuple=True),
+            'b_shift_limit': ArgRange(values=[-80., 80.], data_type=DataType.FLOAT, is_tuple=True),
         }
 
 
@@ -358,7 +354,7 @@ class SolarizeTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'threshold_range': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True)
+            'threshold_range': ArgRange(values=[0.7, 1.], data_type=DataType.FLOAT, is_tuple=True)
         }
 
 
@@ -384,7 +380,7 @@ class PosterizeTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'num_bits': ArgRange(values=[1, 7], data_type=DataType.INT)
+            'num_bits': ArgRange(values=[2, 7], data_type=DataType.INT)
         }
 
 
@@ -494,8 +490,6 @@ class ToSepiaTransform(BaseTransform):
         return {}
 
 
-## Transformations of blurring and sharpness
-
 class BlurTransform(BaseTransform):
     def __init__(
         self,
@@ -518,7 +512,7 @@ class BlurTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'blur_limit': ArgRange(values=[3, Inf.TINY.value], data_type=DataType.INT, is_tuple=True)
+            'blur_limit': ArgRange(values=[3, 10], data_type=DataType.INT, is_tuple=True)
         }
 
 
@@ -548,7 +542,7 @@ class GaussianBlurTransform(BaseTransform):
     def get_ranges() -> dict[str, list]:
         return {
             'blur_limit': ArgRange(values=[0, Inf.TINY.value], data_type=DataType.INT),
-            'sigma_limit': ArgRange(values=[0., Inf.TINY.value], data_type=DataType.FLOAT, is_tuple=True)
+            'sigma_limit': ArgRange(values=[0., Inf.TINY_VERY.value], data_type=DataType.FLOAT, is_tuple=True)
         }
 
 
@@ -574,7 +568,7 @@ class MedianBlurTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'blur_limit': ArgRange(values=[3, Inf.TINY.value], data_type=DataType.INT, is_tuple=True)
+            'blur_limit': ArgRange(values=[3, 12], data_type=DataType.INT, is_tuple=True)
         }
 
 
@@ -609,7 +603,7 @@ class MotionBlurTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'blur_limit': ArgRange(values=[3, Inf.SMALL.value], data_type=DataType.INT, is_tuple=True),
+            'blur_limit': ArgRange(values=[3, 15], data_type=DataType.INT, is_tuple=True),
             'allow_shifted': ArgRange(values=[True, False], data_type=DataType.BOOL),
             'angle_range': ArgRange(values=[0., 360.], data_type=DataType.FLOAT, is_tuple=True),
             'direction_range': ArgRange(values=[-1., 1.], data_type=DataType.FLOAT, is_tuple=True),
@@ -656,44 +650,6 @@ class SharpenTransform(BaseTransform):
         }
 
 
-class UnsharpMaskTransform(BaseTransform):
-    def __init__(
-        self, 
-        blur_limit: tuple[int, int] | int = (3, 7),
-        sigma_limit: tuple[float, float] | float = 0,
-        alpha: tuple[float, float] | float = (0.2, 0.5),
-        threshold: int = 10,
-        seed: int = GLOBAL_SEED
-    ):
-        super().__init__()
-        self.alpha = alpha
-        self.sigma_limit = sigma_limit
-        self.blur_limit = blur_limit
-        self.threshold = threshold
-        self.seed = seed
-
-    def transform(self, img: Any) -> Any:
-        transform_pipeline = A.Compose([
-            A.UnsharpMask(
-                alpha=self.alpha,
-                blur_limit=self.blur_limit,
-                sigma_limit=self.sigma_limit,
-                threshold=self.threshold,
-                p=1
-            )
-        ], seed=self.seed)
-        return transform_pipeline(image=img)['image']
-
-    @staticmethod
-    def get_ranges() -> dict[str, list]:
-        return {
-            'alpha': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
-            'sigma_limit': ArgRange(values=[0., Inf.SMALL.value], data_type=DataType.FLOAT),
-            'blur_limit': ArgRange(values=[0, Inf.BIG.value], data_type=DataType.INT, is_tuple=True),
-            'threshold': ArgRange(values=[0, 255], data_type=DataType.INT)
-        }
-
-
 class EmbossTransform(BaseTransform):
     def __init__(
         self, 
@@ -723,8 +679,6 @@ class EmbossTransform(BaseTransform):
             'strength': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True)
         }
 
-
-## Noise transforms
 
 class GaussNoiseTransform(BaseTransform):
     def __init__(
@@ -757,8 +711,8 @@ class GaussNoiseTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'std_range': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
-            'mean_range': ArgRange(values=[-1., 1.], data_type=DataType.FLOAT, is_tuple=True),
+            'std_range': ArgRange(values=[0., 0.2], data_type=DataType.FLOAT, is_tuple=True),
+            'mean_range': ArgRange(values=[-0.2, 0.2], data_type=DataType.FLOAT, is_tuple=True),
             'per_channel': ArgRange(values=[False, True], data_type=DataType.BOOL),
             'noise_scale_factor': ArgRange(values=[0., 1.], data_type=DataType.FLOAT)
         }
@@ -823,12 +777,10 @@ class ISONoiseTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'intensity': ArgRange(values=[0., Inf.TINY_VERY.value], data_type=DataType.FLOAT, is_tuple=True),
+            'intensity': ArgRange(values=[0., 0.8], data_type=DataType.FLOAT, is_tuple=True),
             'color_shift': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
         }
 
-
-## Dropout transforms
 
 class CoarseDropoutTransform(BaseTransform):
     def __init__(
@@ -861,9 +813,9 @@ class CoarseDropoutTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'num_holes_range': ArgRange(values=[1, Inf.LARGE.value], data_type=DataType.INT, is_tuple=True),
-            'hole_height_range': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
-            'hole_width_range': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
+            'num_holes_range': ArgRange(values=[1, Inf.SMALL.value], data_type=DataType.INT, is_tuple=True),
+            'hole_height_range': ArgRange(values=[0., 0.05], data_type=DataType.FLOAT, is_tuple=True),
+            'hole_width_range': ArgRange(values=[0., 0.05], data_type=DataType.FLOAT, is_tuple=True),
             'fill': ArgRange(values=[0, 255], data_type=DataType.INT)
         }
 
@@ -896,13 +848,11 @@ class GridDropoutTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'ratio': ArgRange(values=[0., 1.], data_type=DataType.FLOAT),
-            'unit_size_range': ArgRange(values=[2, Inf.LARGE.value], data_type=DataType.INT, is_tuple=True),
+            'ratio': ArgRange(values=[0., 0.4], data_type=DataType.FLOAT),
+            'unit_size_range': ArgRange(values=[2, Inf.SMALL.value], data_type=DataType.INT, is_tuple=True),
             'fill': ArgRange(values=[0, 255], data_type=DataType.INT)
         }
 
-
-## Transformation of compression and artifacts
 
 class CompressionTransform(BaseTransform):
     def __init__(
@@ -930,7 +880,7 @@ class CompressionTransform(BaseTransform):
     def get_ranges() -> dict[str, list]:
         return {
             'compression_type': ArgRange(values=['jpeg', 'webp'], data_type=DataType.STR),
-            'quality_range': ArgRange(values=[1, 100], data_type=DataType.INT, is_tuple=True)
+            'quality_range': ArgRange(values=[5, 100], data_type=DataType.INT, is_tuple=True)
         }
 
 
@@ -956,7 +906,7 @@ class DownscaleTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'scale_range': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True)
+            'scale_range': ArgRange(values=[0.2, 1.], data_type=DataType.FLOAT, is_tuple=True)
         }
 
 
@@ -985,12 +935,10 @@ class PixelDropoutTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'dropout_prob': ArgRange(values=[0., 1.], data_type=DataType.FLOAT),
+            'dropout_prob': ArgRange(values=[0., 0.15], data_type=DataType.FLOAT),
             'per_channel': ArgRange(values=[False, True], data_type=DataType.BOOL),
         }
 
-
-## Weather and atmospheric conditions
 
 class RainTransform(BaseTransform):
     def __init__(
@@ -1034,7 +982,7 @@ class RainTransform(BaseTransform):
             'drop_length': ArgRange(values=[1, Inf.TINY.value], data_type=DataType.INT),
             'drop_width': ArgRange(values=[1, Inf.TINY_VERY.value], data_type=DataType.INT),
             'blur_value': ArgRange(values=[1, Inf.TINY.value], data_type=DataType.INT),
-            'brightness_coefficient': ArgRange(values=[0., 1.], data_type=DataType.FLOAT)
+            'brightness_coefficient': ArgRange(values=[0.6, 1.], data_type=DataType.FLOAT)
         }
 
 
@@ -1066,9 +1014,8 @@ class SnowTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'snow_point_range': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
-            'brightness_coeff': ArgRange(values=[0., Inf.TINY.value], data_type=DataType.FLOAT),
-            'method': ArgRange(values=['bleach', 'texture'], data_type=DataType.STR)
+            'snow_point_range': ArgRange(values=[0.5, 0.9], data_type=DataType.FLOAT, is_tuple=True),
+            'brightness_coeff': ArgRange(values=[0.7, 1.7], data_type=DataType.FLOAT),
         }
 
 
@@ -1098,7 +1045,7 @@ class FogTransform(BaseTransform):
     def get_ranges() -> dict[str, list]:
         return {
             'fog_coef_range': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
-            'alpha_coef': ArgRange(values=[0., 1.], data_type=DataType.FLOAT)
+            'alpha_coef': ArgRange(values=[0., 0.1], data_type=DataType.FLOAT)
         }
 
 
@@ -1237,11 +1184,10 @@ class SpatterTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'mean': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
-            'std': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
+            'mean': ArgRange(values=[0., 0.5], data_type=DataType.FLOAT, is_tuple=True),
+            'std': ArgRange(values=[0., 0.5], data_type=DataType.FLOAT, is_tuple=True),
             'gauss_sigma': ArgRange(values=[0., Inf.TINY.value], data_type=DataType.FLOAT, is_tuple=True),
-            'cutout_threshold': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
-            'intensity': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
+            'intensity': ArgRange(values=[0., 0.5], data_type=DataType.FLOAT, is_tuple=True),
             'mode': ArgRange(values=['rain', 'mud'], data_type=DataType.STR)
         }
 
@@ -1277,8 +1223,8 @@ class ChromaticAberrationTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'primary_distortion_limit': ArgRange(values=[-Inf.TINY_VERY.value, Inf.TINY_VERY.value], data_type=DataType.FLOAT, is_tuple=True),
-            'secondary_distortion_limit': ArgRange(values=[-Inf.TINY_VERY.value, Inf.TINY_VERY.value], data_type=DataType.FLOAT, is_tuple=True),
+            'primary_distortion_limit': ArgRange(values=[-0.7, 0.7], data_type=DataType.FLOAT, is_tuple=True),
+            'secondary_distortion_limit': ArgRange(values=[-0.7, 0.7], data_type=DataType.FLOAT, is_tuple=True),
             'mode': ArgRange(values=['green_purple', 'red_blue', 'random'], data_type=DataType.STR),
             'interpolation': ArgRange(values=[cv2.INTER_NEAREST, cv2.INTER_LINEAR, cv2.INTER_CUBIC, cv2.INTER_AREA, cv2.INTER_LANCZOS4], data_type=DataType.INT)
         }
@@ -1309,7 +1255,7 @@ class DefocusTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'radius': ArgRange(values=[1, 15], data_type=DataType.INT, is_tuple=True),
+            'radius': ArgRange(values=[1, 11], data_type=DataType.INT, is_tuple=True),
             'alias_blur': ArgRange(values=[0., Inf.TINY.value], data_type=DataType.FLOAT, is_tuple=True)
         }
 
@@ -1339,12 +1285,10 @@ class ZoomBlurTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'max_factor': ArgRange(values=[1., Inf.TINY_VERY.value], data_type=DataType.FLOAT, is_tuple=True),
-            'step_factor': ArgRange(values=[0., 1], data_type=DataType.FLOAT, is_tuple=True),
+            'max_factor': ArgRange(values=[1., 1.1], data_type=DataType.FLOAT, is_tuple=True),
+            'step_factor': ArgRange(values=[0., 0.05], data_type=DataType.FLOAT, is_tuple=True),
         }
 
-
-## Advanced transformations
 
 class MorphologicalTransform(BaseTransform):
     def __init__(
@@ -1371,7 +1315,7 @@ class MorphologicalTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'scale': ArgRange(values=[1, Inf.TINY.value], data_type=DataType.INT, is_tuple=True),
+            'scale': ArgRange(values=[1, 7], data_type=DataType.INT, is_tuple=True),
             'operation': ArgRange(values=['dilation', 'erosion'], data_type=DataType.STR)
         }
 
@@ -1398,5 +1342,5 @@ class ShotNoiseTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'scale_range': ArgRange(values=[0., 0.3], data_type=DataType.FLOAT, is_tuple=True)
+            'scale_range': ArgRange(values=[0., 0.2], data_type=DataType.FLOAT, is_tuple=True)
         }
