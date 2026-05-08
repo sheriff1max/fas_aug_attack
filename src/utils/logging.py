@@ -7,6 +7,7 @@ from collections import defaultdict
 import pandas as pd
 from .plots import save_plot, save_importance_barh
 import optuna
+from datetime import datetime
 
 
 class LoggerOptuna:
@@ -190,6 +191,7 @@ class LoggerOptuna:
             data = {
                 'list_transforms': list_transforms,
                 'description': self.description,
+                'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             }
 
             self.save_json(data=data, filename=self.FILENAME_METAINFO)
