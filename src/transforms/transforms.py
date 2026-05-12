@@ -354,7 +354,7 @@ class SolarizeTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'threshold_range': ArgRange(values=[0.7, 1.], data_type=DataType.FLOAT, is_tuple=True)
+            'threshold_range': ArgRange(values=[0.8, 1.], data_type=DataType.FLOAT, is_tuple=True)
         }
 
 
@@ -644,7 +644,7 @@ class SharpenTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'alpha': ArgRange(values=[0., 1.], data_type=DataType.FLOAT, is_tuple=True),
+            'alpha': ArgRange(values=[0., 0.8], data_type=DataType.FLOAT, is_tuple=True),
             'lightness': ArgRange(values=[0., Inf.TINY_VERY.value], data_type=DataType.FLOAT, is_tuple=True),
             'method': ArgRange(values=['kernel', 'gaussian'], data_type=DataType.STR),
         }

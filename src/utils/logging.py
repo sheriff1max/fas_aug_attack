@@ -100,7 +100,7 @@ class LoggerOptuna:
         self._logs['step'].append(step)
         self._logs['score'].append(score)
         self._logs['params'].append(params)
-        self._save_metainfo(params=params)
+        self._save_metainfo()
 
     def end(self, dict_importance: dict[str, float]) -> None:
         """"""
@@ -178,18 +178,13 @@ class LoggerOptuna:
             img = img.astype(np.uint8)
         Image.fromarray(img).save(path)
 
-    def _save_metainfo(self, params: dict) -> None:
+    def _save_metainfo(self) -> None:
         """Сохранение метаинформации об оптимизации
 
-        :param params:
         :return:
         """
         if not self._meta_saved:
-            list_transforms = list(set([
-                param.split('--')[-1] for param in params if 'Transform' in param
-            ]))
             data = {
-                'list_transforms': list_transforms,
                 'description': self.description,
                 'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             }
