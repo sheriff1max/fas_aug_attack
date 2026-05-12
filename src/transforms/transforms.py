@@ -134,7 +134,7 @@ class OpticalDistortionTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'distort_limit': ArgRange(values=[-Inf.TINY_VERY.value, Inf.TINY_VERY.value], data_type=DataType.FLOAT, is_tuple=True),
+            'distort_limit': ArgRange(values=[-0.5, 10], data_type=DataType.FLOAT, is_tuple=True),
             'fill': ArgRange(values=[0, 255], data_type=DataType.INT)
         }
 
