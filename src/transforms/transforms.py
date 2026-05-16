@@ -512,7 +512,7 @@ class BlurTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'blur_limit': ArgRange(values=[3, 10], data_type=DataType.INT, is_tuple=True)
+            'blur_limit': ArgRange(values=[3, 7], data_type=DataType.INT, is_tuple=True)
         }
 
 
@@ -541,7 +541,7 @@ class GaussianBlurTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'blur_limit': ArgRange(values=[0, Inf.TINY.value], data_type=DataType.INT),
+            'blur_limit': ArgRange(values=[0, 8], data_type=DataType.INT),
             'sigma_limit': ArgRange(values=[0., Inf.TINY_VERY.value], data_type=DataType.FLOAT, is_tuple=True)
         }
 
@@ -568,7 +568,7 @@ class MedianBlurTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'blur_limit': ArgRange(values=[3, 12], data_type=DataType.INT, is_tuple=True)
+            'blur_limit': ArgRange(values=[3, 9], data_type=DataType.INT, is_tuple=True)
         }
 
 
@@ -711,8 +711,8 @@ class GaussNoiseTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'std_range': ArgRange(values=[0., 0.2], data_type=DataType.FLOAT, is_tuple=True),
-            'mean_range': ArgRange(values=[-0.2, 0.2], data_type=DataType.FLOAT, is_tuple=True),
+            'std_range': ArgRange(values=[0., 0.1], data_type=DataType.FLOAT, is_tuple=True),
+            'mean_range': ArgRange(values=[-0.1, 0.1], data_type=DataType.FLOAT, is_tuple=True),
             'per_channel': ArgRange(values=[False, True], data_type=DataType.BOOL),
         }
 
@@ -934,7 +934,7 @@ class PixelDropoutTransform(BaseTransform):
     @staticmethod
     def get_ranges() -> dict[str, list]:
         return {
-            'dropout_prob': ArgRange(values=[0., 0.15], data_type=DataType.FLOAT),
+            'dropout_prob': ArgRange(values=[0., 0.1], data_type=DataType.FLOAT),
             'per_channel': ArgRange(values=[False, True], data_type=DataType.BOOL),
         }
 
